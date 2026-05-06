@@ -1,12 +1,10 @@
 mod task;
+mod generator;
 
-use task::{Task, TaskKind};
+use generator::generate_tasks;
 fn main() {
-    let task = Task {
-        id: 1,
-        arrival_time: 0,
-        kind: TaskKind::CPU,
-        duration: 100,
-    };
-    println!("{:?}", task);
+    let tasks = generate_tasks(10);
+    for task in tasks {
+        println!("{:?}", task);
+    }
 }
