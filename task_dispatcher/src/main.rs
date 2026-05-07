@@ -26,14 +26,13 @@ fn main() {
             sched.add_task(task);
         }
     }
-    // Clone the program start time for use in worker threads if needed
-    let start_clone = program_start.clone();
     // create worker threads
     let mut handles = vec![];
 
     // create 4 workers
     for i in 0..12 {
         // clone Arc references for the scheduler and metrics to move into the thread
+        let start_clone = program_start.clone();
         let scheduler_clone = Arc::clone(&scheduler);
         let metrics_clone = Arc::clone(&metrics);
 
@@ -42,17 +41,34 @@ fn main() {
             loop {
                 let task_option = {
                     let mut sched = scheduler_clone.lock().unwrap();
-                    sched.get_next_task()
+                    if i < 2{
+                        // For the first two workers, prioritize long tasks
+                        if let Some(task) = sched.get_next_long_task() {
+                            Some(task)
+                        } else {
+                            // If no long tasks are available, check for regular tasks
+                            sched.get_next_task()
+                        }
+                    } else {
+                        //  For the remaining workers, prioritize regular tasks
+                        if let Some(task) = sched.get_next_task(){
+                            Some(task)
+                        } else {
+                            // If no regular tasks are available, check for long tasks
+                            sched.get_next_long_task()
+                        }
+                    }
                 };
 
                 match task_option {
                     Some(task) => {
-                        println!("Worker {} picked task {}", i, task.id);
+                        println!("Worker {} picked task {} | duration: {}", i, task.id, task.duration);
 
                         let completed_task = process_task(task, start_clone);
 
                         let mut m = metrics_clone.lock().unwrap();
                         m.complete_task(&completed_task);
+                        println!("Worker {} completed task {} | duration: {}", i, completed_task.id, completed_task.duration);
                     }
                     None => {
                         break; // no more tasks
