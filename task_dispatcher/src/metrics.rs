@@ -4,6 +4,7 @@ pub struct Metrics {
     pub total_completed: u32,
     pub total_wait_time: u128,
     pub total_turnaround_time: u128,
+    pub total_tasks_time: u64,
 }
 
 impl Metrics {
@@ -12,6 +13,7 @@ impl Metrics {
             total_completed: 0,
             total_wait_time: 0,
             total_turnaround_time: 0,
+            total_tasks_time: 0,
         }
     }
     // Updates metrics when a task is completed.
@@ -22,6 +24,7 @@ impl Metrics {
             let wait = start as i128 - task.arrival_time as i128;
             let turnaround = finish as i128 - task.arrival_time as i128;
 
+            self.total_tasks_time += task.duration;
             self.total_wait_time += wait.max(0) as u128;
             self.total_turnaround_time += turnaround.max(0) as u128;
         }
@@ -39,6 +42,10 @@ impl Metrics {
             println!(
                 "Average turnaround time: {}",
                 self.total_turnaround_time / self.total_completed as u128
+            );
+            println!(
+                "Total tasks time: {}",
+                self.total_tasks_time
             );
         }
     }

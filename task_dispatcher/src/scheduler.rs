@@ -26,6 +26,14 @@ impl Scheduler {
     // Retrieves the next task from the scheduler's queue
     pub fn get_next_task(&mut self) -> Option<Task> {
         // Round-robin scheduling between CPU and IO tasks
+        self.cpu_queue
+            .make_contiguous()
+            .sort_by_key(|task| task.duration);
+        
+        self.io_queue
+            .make_contiguous()
+            .sort_by_key(|task| task.duration);
+
         if !self.last_was_cpu {
             if let Some(task) = self.cpu_queue.pop_front() {
                 self.last_was_cpu = true;
