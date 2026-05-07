@@ -15,7 +15,7 @@ use worker::process_task;
 
 fn main() {
     let program_start = Instant::now();
-    let tasks = generate_tasks(10);
+    let tasks = generate_tasks(500);
     let scheduler = Arc::new(Mutex::new(Scheduler::new()));
     let metrics = Arc::new(Mutex::new(Metrics::new()));
 
@@ -32,7 +32,7 @@ fn main() {
     let mut handles = vec![];
 
     // create 4 workers
-    for i in 0..4 {
+    for i in 0..8 {
         // clone Arc references for the scheduler and metrics to move into the thread
         let scheduler_clone = Arc::clone(&scheduler);
         let metrics_clone = Arc::clone(&metrics);
