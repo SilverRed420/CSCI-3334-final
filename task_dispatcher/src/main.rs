@@ -32,7 +32,7 @@ fn main() {
     let mut handles = vec![];
 
     // create 4 workers
-    for i in 0..8 {
+    for i in 0..12 {
         // clone Arc references for the scheduler and metrics to move into the thread
         let scheduler_clone = Arc::clone(&scheduler);
         let metrics_clone = Arc::clone(&metrics);
