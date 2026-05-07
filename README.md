@@ -1,74 +1,125 @@
-Project Design
-Main Components
-Task Generator: Creates tasks over time
-Queue: Stores tasks before execution
-Dispatcher: Decides which task goes next
-Worker Pool: Executes tasks concurrently
-Metrics Collector: Tracks performance
-Task Structure
+# Concurrent Task Dispatcher in Rust
 
-Each task includes:
+## Overview
 
-id
-arrival_time
-type (CPU or IO)
-duration
-Scheduling Policy
+This program simulates a task scheduling system using Rust.
+It generates tasks, assigns them to queues, and processes them using multiple worker threads.
 
-This project uses: [INSERT YOUR POLICY HERE]
-(Example: FIFO, Priority, Shortest Job First)
+The system supports different workload types and allows user input to control how tasks are generated.
 
-Reason:
-Explain briefly why you chose this policy and what it improves.
+---
 
-Concurrency Tools Used
-Threads
-Channels OR Arc/Mutex
-Explain where and why you used them.
-Metrics Collected
-Total tasks completed
-Makespan (total runtime)
-Average wait time
-Average turnaround time
-Additional metrics:
-[Add 2+ of your choice]
-Experiments
-Experiment A: Balanced Workload
-Mix of CPU and IO tasks
-Summary of results:
-(Write 2–3 sentences about what happened)
-Experiment B: Stressed Workload
-Example: many CPU-heavy tasks
-Summary of results:
-(Write 2–3 sentences comparing performance)
-Results Summary
+## Requirements
 
-Briefly compare both experiments and explain what you learned.
+* Rust (latest stable recommended)
+* Cargo (comes with Rust)
 
-Lessons Learned
-What worked well
-What was difficult
-Any bugs or issues you fixed
-How the System Works (Simple Explanation)
+---
 
-Tasks are generated over time and placed into a queue.
-The dispatcher selects tasks based on the scheduling policy and sends them to available workers.
-Workers process tasks and report completion while the system tracks performance metrics.
+## How to Run
 
-Tool Use Disclosure
+### 1. Open terminal in project folder
 
-Tools used:
+Navigate to the project directory:
 
-(Example: ChatGPT, documentation, etc.)
+```bash
+cd task_dispatcher
+```
 
-Help received:
+---
 
-(What the tool helped you with)
+### 2. Build the project
 
-Accepted advice:
+```bash
+cargo build
+```
 
-(One thing that worked)
+---
 
-Rejected or fixed advice:
+### 3. Run the program
 
-(One thing you had to change)
+```bash
+cargo run
+```
+
+---
+
+## Program Interaction
+
+When the program starts, you will be asked to choose a workload:
+
+```text
+Choose a workload type:
+1. Balanced (default)
+2. CPU-Intensive
+```
+
+Then you will be asked to choose the number of tasks:
+
+```text
+Enter number of tasks (default = 500):
+```
+
+---
+
+## Workload Types
+
+* **Balanced**
+
+  * Even mix of CPU and IO tasks
+
+* **CPU-Intensive**
+
+  * Mostly CPU tasks (about 80%)
+
+---
+
+## What the Program Does
+
+* Generates tasks with random durations (80–1000 ms)
+* Separates tasks into:
+
+  * Long tasks
+  * CPU tasks
+  * IO tasks
+* Uses 12 worker threads:
+
+  * 2 workers prioritize long tasks
+  * 10 workers handle CPU/IO tasks
+* Workers can help other queues if their own queue is empty
+* Tracks performance metrics
+
+---
+
+## Output
+
+The program prints:
+
+* Task processing activity
+* Total tasks completed
+* Average wait time
+* Average turnaround time
+
+---
+
+## Key Features
+
+* Multi-threaded execution
+* Multiple scheduling queues
+* Dynamic workload selection
+* Randomized task durations
+* Performance measurement
+
+---
+
+## Notes
+
+* Long tasks are defined as tasks with duration ≥ 700 ms
+* Short tasks are prioritized to reduce wait time
+* The system uses `Arc<Mutex<...>>` to safely share data between threads
+
+---
+
+## Author
+
+Eleazar Barboza
