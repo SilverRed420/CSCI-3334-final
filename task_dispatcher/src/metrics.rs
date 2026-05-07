@@ -35,7 +35,7 @@ impl Metrics {
 
         if self.total_completed > 0 {
             println!(
-                "Average wait time: {}",
+                "Average wait time: {} ms",
                 self.total_wait_time / self.total_completed as u128
             );
 
@@ -44,7 +44,7 @@ impl Metrics {
                 self.total_turnaround_time / self.total_completed as u128
             );
             println!(
-                "Total tasks time: {}",
+                "Total tasks time: {} ms",
                 self.total_tasks_time
             );
         }

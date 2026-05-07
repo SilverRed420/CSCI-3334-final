@@ -4,7 +4,9 @@ mod generator;
 mod scheduler;
 mod worker;
 mod metrics;
+mod workload_chooser;
 
+use workload_chooser::{get_workload_choice, get_task_count};
 use std::time::Instant;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -14,8 +16,13 @@ use generator::generate_tasks;
 use worker::process_task;
 
 fn main() {
+    let workload = get_workload_choice();
+    println!("Selected workload: {}", workload);
+    let task_count = get_task_count();
+    println!("Number of tasks: {}", task_count);
+
     let program_start = Instant::now();
-    let tasks = generate_tasks(500);
+    let tasks = generate_tasks(task_count, &workload);
     let scheduler = Arc::new(Mutex::new(Scheduler::new()));
     let metrics = Arc::new(Mutex::new(Metrics::new()));
 
@@ -29,7 +36,7 @@ fn main() {
     // create worker threads
     let mut handles = vec![];
 
-    // create 4 workers
+    // create 12 workers
     for i in 0..12 {
         // clone Arc references for the scheduler and metrics to move into the thread
         let start_clone = program_start.clone();
