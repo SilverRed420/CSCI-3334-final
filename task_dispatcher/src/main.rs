@@ -5,6 +5,7 @@ mod scheduler;
 mod worker;
 mod metrics;
 
+use std::time::Instant;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use metrics::Metrics;
@@ -13,6 +14,7 @@ use generator::generate_tasks;
 use worker::process_task;
 
 fn main() {
+    let program_start = Instant::now();
     let tasks = generate_tasks(10);
     let scheduler = Arc::new(Mutex::new(Scheduler::new()));
     let metrics = Arc::new(Mutex::new(Metrics::new()));
@@ -24,7 +26,8 @@ fn main() {
             sched.add_task(task);
         }
     }
-
+    // Clone the program start time for use in worker threads if needed
+    let start_clone = program_start.clone();
     // create worker threads
     let mut handles = vec![];
 
@@ -44,11 +47,12 @@ fn main() {
 
                 match task_option {
                     Some(task) => {
-                        println!("Worker {} picked task {}", i+1, task.id);
-                        process_task(task);
+                        println!("Worker {} picked task {}", i, task.id);
+
+                        let completed_task = process_task(task, start_clone);
 
                         let mut m = metrics_clone.lock().unwrap();
-                        m.complete_task();
+                        m.complete_task(&completed_task);
                     }
                     None => {
                         break; // no more tasks
@@ -66,5 +70,6 @@ fn main() {
     }
 
     let final_metrics = metrics.lock().unwrap();
-    println!("Total tasks completed: {}", final_metrics.total_completed);
+    
+    final_metrics.print_summary();
 }

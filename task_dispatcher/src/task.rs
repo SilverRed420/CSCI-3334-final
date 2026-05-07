@@ -13,4 +13,7 @@ pub struct Task {
     pub arrival_time: u64,
     pub kind: TaskKind,
     pub duration: u64,
+
+    pub start_time: Option<u128>,
+    pub finish_time: Option<u128>,
 }

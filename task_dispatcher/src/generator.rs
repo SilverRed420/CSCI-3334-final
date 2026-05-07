@@ -13,10 +13,13 @@ pub fn generate_tasks(count: u32) -> Vec<Task> {
         };
 
         let task = Task {
-            id: i+1,
+            id: i,
             arrival_time: i as u64,
             kind,
             duration: 100,
+
+            start_time: None,
+            finish_time: None,
         };
 
         tasks.push(task);
